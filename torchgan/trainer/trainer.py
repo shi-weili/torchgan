@@ -131,5 +131,5 @@ class Trainer(BaseTrainer):
             test_noise=test_noise
         )
 
-	self._store_loss_maps()
+        self._store_loss_maps()
         self._store_metric_maps()

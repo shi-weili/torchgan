@@ -126,9 +126,6 @@ class BaseTrainer(object):
                 )
             setattr(self, key, val)
 
-        self._store_loss_maps()
-        self._store_metric_maps()
-
         os.makedirs(self.checkpoints.rsplit("/", 1)[0], exist_ok=True)
         os.makedirs(self.recon, exist_ok=True)
 

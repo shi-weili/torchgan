@@ -126,15 +126,6 @@ class BaseTrainer(object):
                 )
             setattr(self, key, val)
 
-        self.logger = Logger(
-            self,
-            losses_list,
-            metrics_list,
-            log_dir=log_dir,
-            nrow=nrow,
-            test_noise=test_noise,
-        )
-
         self._store_loss_maps()
         self._store_metric_maps()
 

@@ -103,8 +103,9 @@ class ParallelTrainer(BaseTrainer):
             else:
                 setattr(self, key, (model["name"]()).to(self.device))
             for m in getattr(self, key)._modules:
-                getattr(self, key)[m] = torch.nn.DataParallel(getattr(self, key)[m],
-                                                              device_ids=devices)
+                getattr(self, key)[m] = torch.nn.DataParallel(
+                    getattr(self, key)[m], device_ids=devices
+                )
             opt = model["optimizer"]
             opt_name = "optimizer_{}".format(key)
             if "var" in opt:
@@ -123,3 +124,12 @@ class ParallelTrainer(BaseTrainer):
                     )
                 else:
                     self.schedulers.append(sched["name"](getattr(self, opt_name)))
+
+        self.logger = Logger(
+            self,
+            losses_list,
+            metrics_list,
+            log_dir=log_dir,
+            nrow=nrow,
+            test_noise=test_noise
+        )

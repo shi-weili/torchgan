@@ -12,13 +12,6 @@ class Trainer(BaseTrainer):
     r"""Standard Trainer for various GANs. This has been designed to work only on one GPU in case
     you are using a GPU.
 
-    Features provided by this Base Trainer are:
-
-    - Loss and Metrics Logging via the ``Logger`` class.
-    - Generating Image Samples.
-    - Saving models at the end of every epoch and loading of previously saved models.
-    - Highly flexible and allows changing hyperparameters by simply adjusting the arguments.
-
     Most of the functionalities provided by the Trainer are flexible enough and can be customized by
     simply passing different arguments. You can train anything from a simple DCGAN to complex CycleGANs
     without ever having to subclass this ``Trainer``.
@@ -128,3 +121,12 @@ class Trainer(BaseTrainer):
                     )
                 else:
                     self.schedulers.append(sched["name"](getattr(self, opt_name)))
+
+        self.logger = Logger(
+            self,
+            losses_list,
+            metrics_list,
+            log_dir=log_dir,
+            nrow=nrow,
+            test_noise=test_noise
+        )

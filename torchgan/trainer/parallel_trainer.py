@@ -103,8 +103,8 @@ class ParallelTrainer(BaseTrainer):
             else:
                 setattr(self, key, (model["name"]()).to(self.device))
             for m in getattr(self, key)._modules:
-                getattr(self, key)[m] = torch.nn.DataParallel(
-                    getattr(self, key)[m], device_ids=devices
+                getattr(self, key)._modules[m] = torch.nn.DataParallel(
+                    getattr(self, key)._modules[m], device_ids=devices
                 )
             opt = model["optimizer"]
             opt_name = "optimizer_{}".format(key)

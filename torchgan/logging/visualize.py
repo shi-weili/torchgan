@@ -472,7 +472,7 @@ class ImageVisualize(Visualize):
                 generator = getattr(trainer, model)
                 with torch.no_grad():
                     image = generator(*self.test_noise[pos])
-                    image = torchvision.utils.make_grid(image)
+                    image = torchvision.utils.make_grid(image, normalize=True)
                     super(ImageVisualize, self).__call__(
                         trainer, image, model, **kwargs
                     )

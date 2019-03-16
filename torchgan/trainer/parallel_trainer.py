@@ -47,7 +47,7 @@ class ParallelTrainer(BaseTrainer):
     Any other argument that you need to store in the object can be simply passed via keyword arguments.
 
     Example:
-        >>> dcgan = DistributedTrainer(
+        >>> dcgan = ParallelTrainer(
                     {"generator": {"name": DCGANGenerator, "args": {"out_channels": 1, "step_channels":
                                    16}, "optimizer": {"name": Adam, "args": {"lr": 0.0002,
                                    "betas": (0.5, 0.999)}}},

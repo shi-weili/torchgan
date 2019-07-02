@@ -80,6 +80,7 @@ class Trainer(object):
         device=torch.device("cuda:0"),
         ncritic=1,
         epochs=5,
+        amp_opt_level=None,
         sample_size=8,
         checkpoints="./model/gan",
         retain_checkpoints=5,
@@ -109,7 +110,7 @@ class Trainer(object):
                 setattr(self, opt_name, (opt["name"](model_params, **opt["args"])))
             else:
                 setattr(self, opt_name, (opt["name"](model_params)))
-            if "scheduler" in opt:
+            if amp_opt_level is None and "scheduler" in opt:
                 sched = opt["scheduler"]
                 if "args" in sched:
                     self.schedulers.append(
@@ -117,6 +118,34 @@ class Trainer(object):
                     )
                 else:
                     self.schedulers.append(sched["name"](getattr(self, opt_name)))
+            
+        if amp_opt_level is not None:
+            from apex import amp
+
+            model_names = [key for key, model in models.items()]
+            opt_names = ["optimizer_{}".format(key) for key, model in models.items()]
+
+            raw_models = [getattr(self, model_name) for model_name in model_names]
+            raw_optimizers = [getattr(self, opt_name) for opt_name in opt_names]
+
+            amp_models, amp_optimizers = amp.initialize(raw_models, raw_optimizers, opt_level=amp_opt_level, num_losses=2)
+
+            for i in range(len(model_names)):
+                setattr(self, model_names[i], amp_models[i])
+                setattr(self, opt_names[i], amp_optimizers[i])
+            
+            for key, model in models.items():
+                opt = model["optimizer"]
+                opt_name = "optimizer_{}".format(key)
+                
+                if "scheduler" in opt:
+                    sched = opt["scheduler"]
+                    if "args" in sched:
+                        self.schedulers.append(
+                            sched["name"](getattr(self, opt_name), **sched["args"])
+                        )
+                    else:
+                        self.schedulers.append(sched["name"](getattr(self, opt_name)))
 
         self.losses = {}
         for loss in losses_list:
